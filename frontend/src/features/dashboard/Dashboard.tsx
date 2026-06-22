@@ -17,7 +17,7 @@ export const Dashboard = () => {
           const Icon = stat.icon;
           return (
             <div key={idx} className="bg-white rounded-lg shadow p-6 flex items-center">
-              <div className={\p-3 rounded-full \ text-white mr-4\}>
+              <div className={`p-3 rounded-full ${stat.color} text-white mr-4`}>
                 <Icon className="w-6 h-6" />
               </div>
               <div>
