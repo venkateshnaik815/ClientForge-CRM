@@ -3,6 +3,11 @@ import { Login } from './features/auth/Login';
 import { Layout } from './components/layout/Layout';
 import { Dashboard } from './features/dashboard/Dashboard';
 import { Leads } from './features/leads/Leads';
+import { Clients } from './features/clients/Clients';
+import { Pipeline } from './features/pipeline/Pipeline';
+import { CalendarView } from './features/calendar/Calendar';
+import { Tasks } from './features/tasks/Tasks';
+import { Settings } from './features/settings/Settings';
 
 function App() {
   return (
@@ -10,16 +15,15 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         
-        {/* Protected layout wrapping CRM routes */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="leads" element={<Leads />} />
-          {/* Placeholders for future routes */}
-          <Route path="clients" element={<div className="p-4">Clients Component Coming Soon</div>} />
-          <Route path="calendar" element={<div className="p-4">Calendar Component Coming Soon</div>} />
-          <Route path="tasks" element={<div className="p-4">Tasks Component Coming Soon</div>} />
-          <Route path="settings" element={<div className="p-4">Settings Component Coming Soon</div>} />
+          <Route path="clients" element={<Clients />} />
+          <Route path="pipeline" element={<Pipeline />} />
+          <Route path="calendar" element={<CalendarView />} />
+          <Route path="tasks" element={<Tasks />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </Router>
