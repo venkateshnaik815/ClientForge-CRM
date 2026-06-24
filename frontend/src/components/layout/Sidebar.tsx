@@ -27,7 +27,11 @@ export const Sidebar = () => {
                 key={item.name}
                 to={item.href}
                 className={({ isActive }) =>
-                  \lex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors \\
+                  `flex items-center px-4 py-3 text-sm font-medium rounded-md transition-colors ${
+                    isActive
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  }`
                 }
               >
                 <Icon className="w-5 h-5 mr-3" />
