@@ -92,7 +92,11 @@ export const Leads = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{lead.company}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={\px-2 inline-flex text-xs leading-5 font-semibold rounded-full \\}>
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      lead.status === 'New' ? 'bg-blue-100 text-blue-800' :
+                      lead.status === 'Contacted' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
+                    }`}>
                       {lead.status}
                     </span>
                   </td>
