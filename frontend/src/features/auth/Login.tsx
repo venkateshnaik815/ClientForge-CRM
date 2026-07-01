@@ -98,16 +98,7 @@ export const Login: React.FC = () => {
           </form>
         </div>
 
-        {/* Generated Admin Details Moved Below the Card */}
-        <div className="mt-8">
-          <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5 text-center shadow-sm">
-            <h4 className="text-sm font-bold text-indigo-900 mb-2">Generated Admin Details:</h4>
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm text-indigo-700">Email: <span className="font-semibold select-all bg-white px-2 py-0.5 rounded border border-indigo-200">admin@clientforge.com</span></p>
-              <p className="text-sm text-indigo-700">Password: <span className="font-semibold select-all bg-white px-2 py-0.5 rounded border border-indigo-200">admin123</span></p>
-            </div>
-          </div>
-        </div>
+
 
       </div>
     </div>
