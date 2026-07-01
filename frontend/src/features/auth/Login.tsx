@@ -95,6 +95,15 @@ export const Login: React.FC = () => {
                 Sign in
               </button>
             </div>
+
+            <div className="mt-6 border-t border-gray-100 pt-6">
+              <p className="text-center text-xs text-gray-500">
+                Demo Credentials:<br/>
+                <span className="font-semibold text-gray-800 select-all mt-1 inline-block">admin@clientforge.com</span>
+                <span className="mx-2 text-gray-300">|</span>
+                <span className="font-semibold text-gray-800 select-all">admin123</span>
+              </p>
+            </div>
           </form>
         </div>
 
