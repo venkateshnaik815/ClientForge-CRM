@@ -1,39 +1,130 @@
 import React from 'react';
-import { Users, TrendingUp, DollarSign, Activity } from 'lucide-react';
+import { DollarSign, Users, Target, TrendingUp, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const chartData = [
+  { name: 'Jan', revenue: 4000, leads: 240 },
+  { name: 'Feb', revenue: 5200, leads: 310 },
+  { name: 'Mar', revenue: 3800, leads: 280 },
+  { name: 'Apr', revenue: 6500, leads: 420 },
+  { name: 'May', revenue: 7800, leads: 490 },
+  { name: 'Jun', revenue: 8400, leads: 520 },
+  { name: 'Jul', revenue: 9900, leads: 600 },
+];
+
+const stats = [
+  { name: 'Total Revenue', value: '$124,500', change: '+14.2%', trend: 'up', icon: DollarSign },
+  { name: 'Active Clients', value: '142', change: '+5.4%', trend: 'up', icon: Users },
+  { name: 'New Leads', value: '1,234', change: '-2.1%', trend: 'down', icon: Target },
+  { name: 'Conversion Rate', value: '24.5%', change: '+4.3%', trend: 'up', icon: TrendingUp },
+];
+
+const activities = [
+  { id: 1, text: 'Alice Freeman accepted the proposal', time: '2 hours ago', icon: CheckCircle2, color: 'text-green-500' },
+  { id: 2, text: 'New lead assigned: TechNova', time: '4 hours ago', icon: Users, color: 'text-blue-500' },
+  { id: 3, text: 'Meeting scheduled with Initech', time: '5 hours ago', icon: Clock, color: 'text-orange-500' },
+  { id: 4, text: 'Contract signed by Globex Corp', time: '1 day ago', icon: CheckCircle2, color: 'text-green-500' },
+];
 
 export const Dashboard = () => {
-  const stats = [
-    { label: 'Total Leads', value: '142', icon: Users, color: 'bg-blue-500' },
-    { label: 'Conversion Rate', value: '24.5%', icon: TrendingUp, color: 'bg-green-500' },
-    { label: 'Revenue Forecast', value: '$124,500', icon: DollarSign, color: 'bg-indigo-500' },
-    { label: 'Active Tasks', value: '28', icon: Activity, color: 'bg-orange-500' },
-  ];
-
   return (
-    <div>
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">Dashboard Overview</h1>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, idx) => {
-          const Icon = stat.icon;
-          return (
-            <div key={idx} className="bg-white rounded-lg shadow p-6 flex items-center">
-              <div className={`p-3 rounded-full ${stat.color} text-white mr-4`}>
-                <Icon className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              </div>
-            </div>
-          );
-        })}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-sm text-gray-500 mt-1">Welcome back, Admin. Here is what's happening today.</p>
+        </div>
+        <div className="flex space-x-3">
+          <button className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            Export Report
+          </button>
+          <button className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 transition">
+            New Campaign
+          </button>
+        </div>
       </div>
 
-      {/* Placeholder for Charts/Tables */}
-      <div className="mt-8 bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
-        <div className="border-t border-gray-200 pt-4">
-          <p className="text-gray-500 text-sm">Activity feed will be populated from the backend...</p>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat) => (
+          <div key={stat.name} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col hover:shadow-md transition">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center">
+                <stat.icon className="w-5 h-5 text-indigo-600" />
+              </div>
+              <span className={`inline-flex items-center text-sm font-semibold ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                {stat.trend === 'up' ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
+                {stat.change}
+              </span>
+            </div>
+            <h3 className="text-gray-500 text-sm font-medium">{stat.name}</h3>
+            <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Main Content Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Chart Section */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-bold text-gray-900">Revenue & Leads Forecast</h2>
+            <select className="text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-1 pl-3 pr-8">
+              <option>Last 7 months</option>
+              <option>Last 30 days</option>
+              <option>This Year</option>
+            </select>
+          </div>
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                  itemStyle={{ fontWeight: 500 }}
+                />
+                <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Recent Activity Side Panel */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">Recent Activity</h2>
+          <div className="space-y-6">
+            {activities.map((activity, index) => (
+              <div key={activity.id} className="flex relative">
+                {index !== activities.length - 1 && (
+                  <div className="absolute top-8 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></div>
+                )}
+                <div className="relative flex items-start space-x-3">
+                  <div className={`relative px-1 py-1 bg-white rounded-full flex items-center justify-center ring-8 ring-white`}>
+                    <activity.icon className={`w-5 h-5 ${activity.color}`} />
+                  </div>
+                  <div className="min-w-0 flex-1 py-1.5">
+                    <div className="text-sm text-gray-800 font-medium">
+                      {activity.text}
+                    </div>
+                    <div className="mt-1 flex text-xs text-gray-500">
+                      <span>{activity.time}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button className="w-full mt-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+            View All Activity
+          </button>
         </div>
       </div>
     </div>
