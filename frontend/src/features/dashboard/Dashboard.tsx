@@ -1,5 +1,5 @@
-import React from 'react';
-import { DollarSign, Users, Target, TrendingUp, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { DollarSign, Users, Target, TrendingUp, ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, X } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const chartData = [
@@ -27,18 +27,48 @@ const activities = [
 ];
 
 export const Dashboard = () => {
+  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
+  const [campaignName, setCampaignName] = useState('');
+
+  const handleExport = () => {
+    // Generate a real CSV file and trigger download
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + "Month,Revenue,Leads\n"
+      + chartData.map(e => `${e.name},${e.revenue},${e.leads}`).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "ClientForge_Dashboard_Report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleCreateCampaign = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert(`Campaign "${campaignName}" launched successfully! Emails are being prepared.`);
+    setIsCampaignModalOpen(false);
+    setCampaignName('');
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       <div className="flex justify-between items-center mb-2">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-sm text-gray-500 mt-1">Welcome back, Admin. Here is what's happening today.</p>
         </div>
         <div className="flex space-x-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+          <button 
+            onClick={handleExport}
+            className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition active:bg-gray-100"
+          >
             Export Report
           </button>
-          <button className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 transition">
+          <button 
+            onClick={() => setIsCampaignModalOpen(true)}
+            className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 transition active:bg-indigo-800"
+          >
             New Campaign
           </button>
         </div>
@@ -65,7 +95,6 @@ export const Dashboard = () => {
 
       {/* Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Chart Section */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-gray-900">Revenue & Leads Forecast</h2>
@@ -97,7 +126,6 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activity Side Panel */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-6">Recent Activity</h2>
           <div className="space-y-6">
@@ -122,11 +150,43 @@ export const Dashboard = () => {
               </div>
             ))}
           </div>
-          <button className="w-full mt-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+          <button onClick={() => alert('Loading full activity history...')} className="w-full mt-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition active:bg-gray-100">
             View All Activity
           </button>
         </div>
       </div>
+
+      {/* New Campaign Modal */}
+      {isCampaignModalOpen && (
+        <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <h3 className="text-lg font-bold text-gray-900">Create New Campaign</h3>
+              <button onClick={() => setIsCampaignModalOpen(false)} className="text-gray-400 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateCampaign} className="p-6 space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Campaign Name</label>
+                <input required type="text" placeholder="e.g. Q4 Outreach" value={campaignName} onChange={e => setCampaignName(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Target Audience</label>
+                <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <option>All Active Clients</option>
+                  <option>New Leads (Last 30 Days)</option>
+                  <option>Enterprise Clients</option>
+                </select>
+              </div>
+              <div className="pt-4 flex justify-end space-x-3 border-t border-gray-100 mt-6">
+                <button type="button" onClick={() => setIsCampaignModalOpen(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-bold text-gray-700 hover:bg-gray-50">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-indigo-600 rounded-lg text-sm font-bold text-white hover:bg-indigo-700">Launch Campaign</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
