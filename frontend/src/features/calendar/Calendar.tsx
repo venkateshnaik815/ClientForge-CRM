@@ -10,8 +10,7 @@ export const CalendarView = () => {
     { date: '2026-06-22', title: 'Client Pitch: TechNova', time: '2:00 PM', color: 'bg-blue-100 text-blue-700 border-blue-200' },
     { date: '2026-08-29', title: 'Product Launch', time: '9:00 AM', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
     { date: '2026-10-12', title: 'Quarterly Review', time: '10:00 AM', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-    { date: '2026-12-10', title: 'Annual Board Meeting', time: '11:00 AM', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-    { date: '2026-12-25', title: 'Company Holiday Party', time: '6:00 PM', color: 'bg-red-100 text-red-700 border-red-200' }
+    { date: '2026-12-10', title: 'Annual Board Meeting', time: '11:00 AM', color: 'bg-blue-100 text-blue-700 border-blue-200' }
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
