@@ -3,7 +3,8 @@ import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
 
 export const CalendarView = () => {
   // Initialize to August 2026
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1));
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 29));
+  const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   
   const [events, setEvents] = useState([
     { date: '2026-06-15', title: 'Summer Kickoff', time: '10:00 AM', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
@@ -16,25 +17,51 @@ export const CalendarView = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({ date: '', title: '', time: '' });
 
-  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  const nextPeriod = () => {
+    if (viewMode === 'month') {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+    } else {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 7));
+    }
+  };
 
+  const prevPeriod = () => {
+    if (viewMode === 'month') {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    } else {
+      setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7));
+    }
+  };
+
+  // Month calculations
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-  
-  // Adjust so Monday is the first column (Mon=0, Sun=6)
-  const startingDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+  const startingDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1; // Mon=0
+  const blanks = Array.from({ length: startingDay });
+  const monthDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  // Week calculations
+  const getWeekDays = (date: Date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const startOfWeek = new Date(d.setDate(diff));
+    
+    return Array.from({length: 7}).map((_, i) => {
+      const nextDay = new Date(startOfWeek);
+      nextDay.setDate(startOfWeek.getDate() + i);
+      return nextDay;
+    });
+  };
+  const weekDays = getWeekDays(currentDate);
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-  const blanks = Array.from({ length: startingDay });
-  const monthDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
-  const getFormattedDate = (day: number) => {
-    const y = currentDate.getFullYear();
-    const m = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const d = String(day).padStart(2, '0');
+  const getFormattedDate = (dateToFormat: Date) => {
+    const y = dateToFormat.getFullYear();
+    const m = String(dateToFormat.getMonth() + 1).padStart(2, '0');
+    const d = String(dateToFormat.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   };
 
@@ -46,6 +73,11 @@ export const CalendarView = () => {
     }]);
     setIsModalOpen(false);
     setNewEvent({ date: '', title: '', time: '' });
+  };
+
+  const isTodayDate = (d: Date) => {
+    // Assuming local simulation today is Aug 29, 2026
+    return d.getFullYear() === 2026 && d.getMonth() === 7 && d.getDate() === 29;
   };
 
   return (
@@ -66,60 +98,116 @@ export const CalendarView = () => {
       <div className="flex-1 bg-white shadow-sm border border-gray-200 rounded-xl flex flex-col overflow-hidden min-h-[600px]">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
           <div className="flex space-x-2">
-            <button onClick={prevMonth} className="p-1.5 hover:bg-gray-200 rounded text-gray-600 transition"><ChevronLeft className="w-5 h-5"/></button>
-            <button onClick={nextMonth} className="p-1.5 hover:bg-gray-200 rounded text-gray-600 transition"><ChevronRight className="w-5 h-5"/></button>
+            <button onClick={prevPeriod} className="p-1.5 hover:bg-gray-200 rounded text-gray-600 transition"><ChevronLeft className="w-5 h-5"/></button>
+            <button onClick={nextPeriod} className="p-1.5 hover:bg-gray-200 rounded text-gray-600 transition"><ChevronRight className="w-5 h-5"/></button>
           </div>
+          
           <h2 className="text-lg font-bold text-gray-900">
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+            {viewMode === 'month' 
+              ? `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+              : `Week of ${monthNames[weekDays[0].getMonth()]} ${weekDays[0].getDate()}, ${weekDays[0].getFullYear()}`
+            }
           </h2>
-          <div className="bg-white rounded-md border border-gray-300 p-1 flex text-sm font-medium shadow-sm">
-            <button className="px-3 py-1 rounded bg-indigo-50 text-indigo-700">Month</button>
-            <button className="px-3 py-1 rounded text-gray-600 hover:bg-gray-50">Week</button>
+          
+          <div className="bg-white rounded-md border border-gray-300 p-1 flex text-sm font-medium shadow-sm cursor-pointer">
+            <button 
+              onClick={() => setViewMode('month')} 
+              className={`px-3 py-1 rounded transition ${viewMode === 'month' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+              Month
+            </button>
+            <button 
+              onClick={() => setViewMode('week')} 
+              className={`px-3 py-1 rounded transition ${viewMode === 'week' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}
+            >
+              Week
+            </button>
           </div>
         </div>
         
-        <div className="flex-1 grid grid-cols-7 grid-rows-[auto_1fr_1fr_1fr_1fr_1fr]">
-          {days.map(day => (
-            <div key={day} className="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-white">
-              {day}
-            </div>
-          ))}
-          
-          {blanks.map((_, i) => (
-            <div key={`blank-${i}`} className="border-b border-r border-gray-100 bg-gray-50/50 min-h-[100px]"></div>
-          ))}
-          
-          {monthDays.map(day => {
-            const dateStr = getFormattedDate(day);
-            const dayEvents = events.filter(e => e.date === dateStr);
-            // Highlight today (Assuming today is Aug 29, 2026 based on local dev environment)
-            const isToday = currentDate.getFullYear() === 2026 && currentDate.getMonth() === 7 && day === 29;
-            
-            return (
-              <div key={day} className="border-b border-r border-gray-100 p-2 min-h-[100px] hover:bg-gray-50 transition relative group">
-                <div className={`text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full mb-1 ${isToday ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700'}`}>
-                  {day}
-                </div>
-                <div className="space-y-1 mt-1">
-                  {dayEvents.map((e, i) => (
-                    <div key={i} className={`text-xs px-2 py-1 rounded border font-medium truncate ${e.color}`}>
-                      {e.time} - {e.title}
-                    </div>
-                  ))}
-                </div>
-                <button 
-                  onClick={() => {
-                    setNewEvent({ ...newEvent, date: dateStr });
-                    setIsModalOpen(true);
-                  }}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-indigo-600 transition"
-                >
-                  <Plus className="w-4 h-4"/>
-                </button>
+        {viewMode === 'month' ? (
+          <div className="flex-1 grid grid-cols-7 grid-rows-[auto_1fr_1fr_1fr_1fr_1fr]">
+            {days.map(day => (
+              <div key={day} className="py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-white">
+                {day}
               </div>
-            );
-          })}
-        </div>
+            ))}
+            
+            {blanks.map((_, i) => (
+              <div key={`blank-${i}`} className="border-b border-r border-gray-100 bg-gray-50/50 min-h-[100px]"></div>
+            ))}
+            
+            {monthDays.map(day => {
+              const testDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+              const dateStr = getFormattedDate(testDate);
+              const dayEvents = events.filter(e => e.date === dateStr);
+              const isToday = isTodayDate(testDate);
+              
+              return (
+                <div key={day} className="border-b border-r border-gray-100 p-2 min-h-[100px] hover:bg-gray-50 transition relative group">
+                  <div className={`text-sm font-bold w-7 h-7 flex items-center justify-center rounded-full mb-1 ${isToday ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-700'}`}>
+                    {day}
+                  </div>
+                  <div className="space-y-1 mt-1">
+                    {dayEvents.map((e, i) => (
+                      <div key={i} className={`text-xs px-2 py-1 rounded border font-medium truncate ${e.color}`}>
+                        {e.time} - {e.title}
+                      </div>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={() => { setNewEvent({ ...newEvent, date: dateStr }); setIsModalOpen(true); }}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-indigo-600 transition"
+                  >
+                    <Plus className="w-4 h-4"/>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          /* WEEK VIEW */
+          <div className="flex-1 flex flex-col">
+            <div className="grid grid-cols-7 border-b border-gray-200 bg-white">
+              {weekDays.map((date, i) => {
+                const isToday = isTodayDate(date);
+                return (
+                  <div key={i} className="py-3 text-center border-r border-gray-100 last:border-r-0">
+                    <div className="text-xs font-bold text-gray-500 uppercase tracking-wider">{days[i]}</div>
+                    <div className={`mx-auto mt-1 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold ${isToday ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-900'}`}>
+                      {date.getDate()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex-1 grid grid-cols-7">
+              {weekDays.map((date, i) => {
+                const dateStr = getFormattedDate(date);
+                const dayEvents = events.filter(e => e.date === dateStr);
+                
+                return (
+                  <div key={i} className="border-r border-gray-100 last:border-r-0 p-3 hover:bg-gray-50/50 transition relative group min-h-[400px]">
+                    <div className="space-y-3">
+                      {dayEvents.map((e, idx) => (
+                        <div key={idx} className={`p-3 rounded-lg border font-medium ${e.color} shadow-sm flex flex-col`}>
+                          <span className="text-xs opacity-75 mb-1">{e.time}</span>
+                          <span className="text-sm">{e.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button 
+                      onClick={() => { setNewEvent({ ...newEvent, date: dateStr }); setIsModalOpen(true); }}
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-indigo-600 transition bg-white rounded-full p-1 shadow-sm border border-gray-200"
+                    >
+                      <Plus className="w-4 h-4"/>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Event Modal */}
