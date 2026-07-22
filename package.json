@@ -1,0 +1,9 @@
+{
+  "name": "clientforge-crm-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build"
+  }
+}
