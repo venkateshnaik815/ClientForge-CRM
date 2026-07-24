@@ -26,7 +26,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Build with Maven
-        run: ./mvnw clean install -DskipTests --no-transfer-progress
+        run: ./mvnw package -DskipTests --no-transfer-progress
 
   frontend-build:
     runs-on: ubuntu-latest
