@@ -12,7 +12,7 @@ target/
 *.ear
 
 # Spring Boot
-.mvn/
+# .mvn/
 !mvnw
 !mvnw.cmd
 
